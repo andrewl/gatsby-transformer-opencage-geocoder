@@ -13,8 +13,6 @@ async function onCreateNode({
   pluginOptions
 ) {
 
-  console.log(pluginOptions);
-
   let nodeGeocodeConfig = false;
   for (i = 0; i < pluginOptions.nodeTypes.length; i++) {
     if (node.internal.type == pluginOptions.nodeTypes[i].nodeType) {
@@ -67,15 +65,21 @@ async function onCreateNode({
     query = node[nodeGeocodeConfig.positionFields.lat] + "," + node[nodeGeocodeConfig.positionFields.lon]
     console.log("Reverse Geocoding: " + query);
   }
+  try {
 
-  opencage.geocode({key: pluginOptions.api_key, q: query}).then(data => {
+    let apiRequestOptions = {key: pluginOptions.api_key, q: query};
+
+    if (nodeGeocodeConfig.addFullResult) {
+      apiRequestOptions.no_annotations = 1;
+    }
+
+    let data = await opencage.geocode(apiRequestOptions);
+
     if (data.status.code == 200) {
       if (data.results.length > 0) {
         var place = data.results[0];
 
         if (geocodeType == forward) {
-          console.log("Creating forward node");
-          console.log(place.geometry);
           createNodeField({
             node,
             name: `geocoderGeometry`,
@@ -83,8 +87,6 @@ async function onCreateNode({
           });
         }
         else if (geocodeType == reverse) {
-          console.log("Creating reverse node");
-          console.log(place.geometry);
           createNodeField({
             node,
             name: `geocoderAddress`,
@@ -93,31 +95,46 @@ async function onCreateNode({
         }
 
         if (nodeGeocodeConfig.addFullResult) {
-          console.log("Creating full node");
-          console.log(place.geometry);
           createNodeField({
             node,
-            name: `geocodedFullResult`,
+            name: `geocoderFullResult`,
             value: place
           });
         }
 
-        console.log(node);
       }
     }
+      /*
     else if (data.status.code == 402) {
-      console.log('hit free-trial daily limit');
-      console.log('become a customer: https://opencagedata.com/pricing'); 
+      console.error('You have hit the OpenCage free-trial daily limit');
+      console.error('become a customer: https://opencagedata.com/pricing'); 
+      process.exit(1);
+    }
+    else if (data.status.code == 403) {
+      console.error('You have reached your quota limit');
+      console.error('More info: https://opencagedata.com'); 
+      process.exit(1);
+    }
+    */
+    else {
+      console.error('error', data.status.message);
+    }
+  } 
+  catch(error) {
+    if (error.response.status == 402) {
+      console.error('You have hit the OpenCage free-trial daily limit');
+      console.error('become a customer: https://opencagedata.com/pricing'); 
+      process.exit(1);
+    }
+    else if (error.response.status == 403) {
+      console.error('You have reached your quota limit');
+      console.error('More info: https://opencagedata.com'); 
+      process.exit(1);
     }
     else {
-      // other possible response codes:
-      //     // https://opencagedata.com/api#codes
-      console.log('error', data.status.message);
+      console.error('error', error.message);
     }
-  }).catch(error => {
-    console.log('error', error.message);
-  });
-
+  }
 }
 
 exports.onCreateNode = onCreateNode
