@@ -1,0 +1,11 @@
+{
+  "name": "gatsby-transformer-opencage-geocoder",
+  "version": "0.1.0",
+  "description": "A transformer plugin for GatsbyJS to forward- and reverse-geocode content nodes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
