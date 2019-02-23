@@ -90,6 +90,11 @@ async function onCreateNode({
           createNodeField({
             node,
             name: `geocoderAddress`,
+            value: place.formatted
+          });
+          createNodeField({
+            node,
+            name: `geocoderAddressFields`,
             value: place.components
           });
         }
