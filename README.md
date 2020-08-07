@@ -9,7 +9,7 @@ So, this means, for example, that if you have a bunch of nodes in a CSV file tha
 
 Or, if you've got some nodes in an Excel file that just contain lat-long coordinates, but you want to display address information alongside them, this transformer plugin can do that as well.
 
-Development of this transformer plugin has been kindly sponsored by OpenCage Data - you can read more about their geocoding service at https://opencagedata.com - including details of their [generous free tier,](https://opencagedata.com/pricing) no credit card required. The free trial allows 2,500 requests per day.
+Development of this transformer plugin has been kindly sponsored by OpenCage Data - you can read more about their geocoding service at https://opencagedata.com - including details of their [generous free trial tier,](https://opencagedata.com/pricing) no credit card required. The free trial allows 2,500 requests per day while testing.
 
 ## Install
 
