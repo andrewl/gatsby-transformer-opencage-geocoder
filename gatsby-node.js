@@ -6,13 +6,9 @@ const reverse = 2;
 async function onCreateNode({
   node,
   actions,
-  loadNodeContent,
-  createNodeId,
-  createContentDigest,
 },
   pluginOptions
 ) {
-
   let nodeGeocodeConfig = false;
   for (i = 0; i < pluginOptions.nodeTypes.length; i++) {
     if (node.internal.type == pluginOptions.nodeTypes[i].nodeType) {
@@ -62,7 +58,16 @@ async function onCreateNode({
     console.log("Geocoding: " + query);
   }
   else if (geocodeType == reverse) {
-    query = node[nodeGeocodeConfig.positionFields.lat] + "," + node[nodeGeocodeConfig.positionFields.lon]
+    if (node[nodeGeocodeConfig.positionFields.lat] && node[nodeGeocodeConfig.positionFields.lon]) {
+      query = node[nodeGeocodeConfig.positionFields.lat] + "," + node[nodeGeocodeConfig.positionFields.lon]
+    }
+    else {
+      for (const field in node) {
+        if (node[field][nodeGeocodeConfig.positionFields.lat] && node[field][nodeGeocodeConfig.positionFields.lon]) {
+          query = node[field][nodeGeocodeConfig.positionFields.lat] + "," + node[field][nodeGeocodeConfig.positionFields.lon]
+        }
+      }
+    }
     console.log("Reverse Geocoding: " + query);
   }
   try {
@@ -109,18 +114,6 @@ async function onCreateNode({
 
       }
     }
-      /*
-    else if (data.status.code == 402) {
-      console.error('You have hit the OpenCage free-trial daily limit');
-      console.error('become a customer: https://opencagedata.com/pricing'); 
-      process.exit(1);
-    }
-    else if (data.status.code == 403) {
-      console.error('You have reached your quota limit');
-      console.error('More info: https://opencagedata.com'); 
-      process.exit(1);
-    }
-    */
     else {
       console.error('error', data.status.message);
     }
